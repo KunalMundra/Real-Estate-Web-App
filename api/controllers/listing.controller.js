@@ -64,7 +64,7 @@ export const getListing = async (req, res, next) => {
 export const getListings = async (req, res, next) => {
     try {
         const limit = parseInt(req.query.limit) || 9;
-        const startIdx = parseInt(req.query.startIdx) || 0;
+        const startIndex = parseInt(req.query.startIndex) || 0;
 
         let offer = req.query.offer;
         if (offer === undefined || offer === 'false') {
@@ -101,7 +101,7 @@ export const getListings = async (req, res, next) => {
         })
             .sort({ [sort]: order })
             .limit(limit)
-            .skip(startIdx);
+            .skip(startIndex);
 
         return res.status(200).json(listings);
 
