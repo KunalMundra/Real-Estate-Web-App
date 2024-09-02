@@ -121,14 +121,14 @@ export default function Listing() {
                             <li className="flex items-center gap-1 whitespace-nowrap ">
                                 <FaBed className="text-lg" />
                                 {listing.bedrooms > 1
-                                    ? `${listing.bedrooms} beds `
-                                    : `${listing.bedrooms} bed `}
+                                    ? `${listing.bedrooms} Beds `
+                                    : `${listing.bedrooms} Bed `}
                             </li>
                             <li className="flex items-center gap-1 whitespace-nowrap ">
                                 <FaBath className="text-lg" />
                                 {listing.bathrooms > 1
-                                    ? `${listing.bathrooms} baths `
-                                    : `${listing.bathrooms} bath `}
+                                    ? `${listing.bathrooms} Baths `
+                                    : `${listing.bathrooms} Bath `}
                             </li>
                             <li className="flex items-center gap-1 whitespace-nowrap ">
                                 <FaParking className="text-lg" />
@@ -142,7 +142,7 @@ export default function Listing() {
                         {currentUser && listing.userRef !== currentUser._id && !contact && (
                             <button
                                 onClick={() => setContact(true)}
-                                className='bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3'
+                                className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
                             >
                                 Contact landlord
                             </button>
