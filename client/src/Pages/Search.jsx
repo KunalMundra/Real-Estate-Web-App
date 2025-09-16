@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ListingItem from "../Components/ListingItem";
+import img1 from '../Images/Image1.jpg';
+import img2 from '../Images/Image2.jpg';
+import img3 from '../Images/Image3.jpg';
+import img4 from '../Images/Image4.jpg';
+import img5 from '../Images/Image5.jpg';
+import img6 from '../Images/Image6.jpg';
+import img7 from '../Images/Image7.jpeg';
+import img8 from '../Images/Image8.jpeg';
+import img9 from '../Images/Image9.jpg';
+import img10 from '../Images/Image10.jpg';
 
 export default function Search() {
     const [sidebarData, setsidebarData] = useState({
@@ -16,7 +26,8 @@ export default function Search() {
     const [listings, setListings] = useState([]);
     const [showMore, setShowMore] = useState(false);
     const navigate = useNavigate();
-
+    const ImageUrls = [[img1], [img2], [img3], [img4], [img5], [img6], [img7], [img8], [img9], [img10]];
+    
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
         const searchTermFromUrl = urlParams.get("searchTerm");
@@ -52,7 +63,11 @@ export default function Search() {
             setShowMore(false);
             const searchQuery = urlParams.toString();
             const res = await fetch(`/api/listing/get?${searchQuery}`);
-            const data = await res.json();
+            let data = await res.json();
+            data=data.map((item, index) => {
+                  item.imageUrls = ImageUrls[index];
+                  return item;
+                });
             if (data.length > 8) {
                 setShowMore(true);
             } else {
@@ -246,7 +261,7 @@ export default function Search() {
                     {!loading &&
                         listings &&
                         listings.map((listing) => (
-                            <ListingItem key={listing._id} listing={listing} />
+                            <ListingItem key={listing.id} listing={listing} />
                         ))}
                     {showMore && (
                         <button
