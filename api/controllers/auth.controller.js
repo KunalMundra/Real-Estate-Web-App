@@ -61,21 +61,19 @@ export const signup = async (req, res, next) => {
     }
 
     try {
-        // Check if username or email already exist
-        const usernameExists = await User.findOne({ username });
+        // Check if username or email already exist (Sequelize)
+        const usernameExists = await User.findOne({ where: { username } });
         if (usernameExists) {
             return next(errorHandler(409, "Username is already registered"));
         }
 
-        const emailExists = await User.findOne({ email });
+        const emailExists = await User.findOne({ where: { email } });
         if (emailExists) {
             return next(errorHandler(409, "Email is already registered"));
         }
 
         const hashedPassword = bcryptjs.hashSync(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword });
-
-        await newUser.save();
+        const newUser = await User.create({ username, email, password: hashedPassword });
 
         return res.status(201).json("User registration completed successfully");
     } catch (error) {
@@ -87,14 +85,14 @@ export const signin = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
-        const validUser = await User.findOne({ email });
+        const validUser = await User.findOne({ where: { email } });
         if (!validUser) return next(errorHandler(404, "User not found!"));
         const validPassword = bcryptjs.compareSync(password, validUser.password);
         if (!validPassword) return next(errorHandler(401, "Wrong Credentials!"));
-        const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: validUser.id }, process.env.JWT_SECRET);
 
-        //To remove password from the json destructure the password and restInfo from the validUser 
-        const { password: pass, ...restInfo } = validUser._doc;
+        // Remove password from the response
+        const { password: pass, ...restInfo } = validUser.toJSON();
         res.cookie('access_token', token, { httpOnly: true }).status(200).json(restInfo);
     } catch (error) {
         next(error);
@@ -103,27 +101,25 @@ export const signin = async (req, res, next) => {
 
 export const google = async (req, res, next) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
+        const user = await User.findOne({ where: { email: req.body.email } });
         if (user) {
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
 
-            const { password: pass, ...restInfo } = user._doc;
+            const { password: pass, ...restInfo } = user.toJSON();
             res.cookie('access_token', token, { httpOnly: true }).status(200).json(restInfo);
         }
         else {
             const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
             const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
-            const newUser = new User({
+            const newUser = await User.create({
                 username: req.body.name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-4),
                 email: req.body.email,
                 password: hashedPassword,
                 avatar: req.body.photo
-            })
+            });
+            const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
 
-            await newUser.save();
-            const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
-
-            const { password: pass, ...restInfo } = newUser._doc;
+            const { password: pass, ...restInfo } = newUser.toJSON();
             res.cookie('access_token', token, { httpOnly: true }).status(200).json(restInfo);
         }
     } catch (error) {

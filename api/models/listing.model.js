@@ -1,63 +1,62 @@
-import mongoose from 'mongoose';
 
-const listingSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: true,
-        },
-        description: {
-            type: String,
-            required: true,
-        },
-        address: {
-            type: String,
-            required: true,
-        },
-        regularPrice: {
-            type: Number,
-            required: true,
-        },
-        discountPrice: {
-            type: Number,
-            required: true,
-        },
-        bathrooms: {
-            type: Number,
-            required: true,
-        },
-        bedrooms: {
-            type: Number,
-            required: true,
-        },
-        furnished: {
-            type: Boolean,
-            required: true,
-        },
-        parking: {
-            type: Boolean,
-            required: true,
-        },
-        type: {
-            type: String,
-            required: true,
-        },
-        offer: {
-            type: Boolean,
-            required: true,
-        },
-        imageUrls: {
-            type: Array,
-            required: true,
-        },
-        userRef: {
-            type: String,
-            required: true,
-        },
+import { DataTypes } from 'sequelize';
+import sequelize from './db.js';
+
+const Listing = sequelize.define('Listing', {
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-    { timestamps: true }
-);
-
-const Listing = mongoose.model('Listing', listingSchema);
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    regularPrice: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    discountPrice: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    bathrooms: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    bedrooms: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    furnished: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+    },
+    parking: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+    },
+    type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    offer: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+    },
+    imageUrls: {
+        type: DataTypes.JSON,
+        allowNull: false,
+    },
+    userRef: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+}, {
+    timestamps: true,
+});
 
 export default Listing;

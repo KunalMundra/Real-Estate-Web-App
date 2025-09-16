@@ -11,18 +11,15 @@ export const createListing = async (req, res, next) => {
 }
 
 export const deleteListing = async (req, res, next) => {
-    const listing = await Listing.findById(req.params.id)
-
-    if (!listing) {
-        return next(errorHandler(404, 'Listing not found!'))
-    }
-
-    if (req.user.id !== listing.userRef) {
-        return next(errorHandler(401, 'You can only delete your own listings.'))
-    }
-
     try {
-        await Listing.findByIdAndDelete(req.params.id);
+        const listing = await Listing.findByPk(req.params.id);
+        if (!listing) {
+            return next(errorHandler(404, 'Listing not found!'));
+        }
+        if (req.user.id !== listing.userRef) {
+            return next(errorHandler(401, 'You can only delete your own listings.'));
+        }
+        await listing.destroy();
         res.status(200).json('Listing has been deleted');
     } catch (error) {
         next(error);
@@ -30,21 +27,14 @@ export const deleteListing = async (req, res, next) => {
 }
 
 export const updateListing = async (req, res, next) => {
-    const listing = await Listing.findById(req.params.id);
-
-    if (!listing) return next(errorHandler(404, "Listing not found!"));
-
-    if (req.user.id !== listing.userRef) {
-        return next(errorHandler(401, 'You can only update your own listings.'))
-    }
-
     try {
-        const updatedListing = await Listing.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
-        );
-        res.status(200).json(updatedListing);
+        const listing = await Listing.findByPk(req.params.id);
+        if (!listing) return next(errorHandler(404, "Listing not found!"));
+        if (req.user.id !== listing.userRef) {
+            return next(errorHandler(401, 'You can only update your own listings.'));
+        }
+        await listing.update(req.body);
+        res.status(200).json(listing);
     } catch (error) {
         next(error)
     }
@@ -52,8 +42,7 @@ export const updateListing = async (req, res, next) => {
 
 export const getListing = async (req, res, next) => {
     try {
-        const listing = await Listing.findById(req.params.id);
-
+        const listing = await Listing.findByPk(req.params.id);
         if (!listing) return next(errorHandler(404, "Listing not found!"));
         res.status(200).json(listing);
     } catch (error) {
@@ -66,45 +55,34 @@ export const getListings = async (req, res, next) => {
         const limit = parseInt(req.query.limit) || 9;
         const startIndex = parseInt(req.query.startIndex) || 0;
 
-        let offer = req.query.offer;
-        if (offer === undefined || offer === 'false') {
-            offer = { $in: [false, true] };
+        // Build where clause for Sequelize
+        const where = {};
+        if (req.query.offer !== undefined && req.query.offer !== 'false') {
+            where.offer = req.query.offer === 'true';
         }
-
-        let parking = req.query.parking;
-        if (parking === undefined || parking === 'false') {
-            parking = { $in: [false, true] };
+        if (req.query.parking !== undefined && req.query.parking !== 'false') {
+            where.parking = req.query.parking === 'true';
         }
-
-        let furnished = req.query.furnished;
-        if (furnished === undefined || furnished === 'false') {
-            furnished = { $in: [false, true] };
+        if (req.query.furnished !== undefined && req.query.furnished !== 'false') {
+            where.furnished = req.query.furnished === 'true';
         }
-
-        let type = req.query.type;
-        if (type === undefined || type === 'all') {
-            type = { $in: ['sale', 'rent'] };
+        if (req.query.type !== undefined && req.query.type !== 'all') {
+            where.type = req.query.type;
         }
-
-        const searchTerm = req.query.searchTerm || '';
+        if (req.query.searchTerm) {
+            where.name = { [Symbol.for('like')]: `%${req.query.searchTerm}%` };
+        }
 
         const sort = req.query.sort || 'createdAt';
+        const order = req.query.order === 'asc' ? 'ASC' : 'DESC';
 
-        const order = req.query.order || 'desc';
-
-        const listings = await Listing.find({
-            name: { $regex: searchTerm, $options: 'i' },
-            offer,
-            furnished,
-            parking,
-            type,
-        })
-            .sort({ [sort]: order })
-            .limit(limit)
-            .skip(startIndex);
-
+        const listings = await Listing.findAll({
+            where,
+            order: [[sort, order]],
+            limit,
+            offset: startIndex,
+        });
         return res.status(200).json(listings);
-
     } catch (error) {
         next(error);
     }
