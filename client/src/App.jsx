@@ -21,7 +21,7 @@ export default function App() {
         <Route path='/SignIn' element={<SignIn />} />
         <Route path='/SignUp' element={<SignUp />} />
         <Route path='/search' element={<Search />} />
-        <Route path='/listing/:listingId' element={<Listing />} />
+        <Route path='/listing/:listingId/:img' element={<Listing />} />
         <Route element={<PrivateRoute />}>
           <Route path='/Profile' element={<Profile />} />
           <Route path='/create-listing' element={<CreateListing />} />

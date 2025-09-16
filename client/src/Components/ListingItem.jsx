@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { MdLocationOn } from "react-icons/md";
 
 export default function ListingItem({ listing }) {
+   const fileName = listing.imageUrls[0].split("/").pop();
     return (
         <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg lg:w-[270px] sm:w-[290px]">
-            <Link to={`/listing/${listing._id}`}>
+            <Link to={`/listing/${listing.id}/${fileName}`}>
                 <img
                     src={
                         listing.imageUrls[0] ||

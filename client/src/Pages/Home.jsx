@@ -5,20 +5,37 @@ import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
 import "swiper/css/bundle";
 import ListingItem from "../Components/ListingItem";
+import img1 from '../Images/Image1.jpg';
+import img2 from '../Images/Image2.jpg';
+import img3 from '../Images/Image3.jpg';
+import img4 from '../Images/Image4.jpg';
+import img5 from '../Images/Image5.jpg';
+import img6 from '../Images/Image6.jpg';
+import img7 from '../Images/Image7.jpeg';
+import img8 from '../Images/Image8.jpeg';
+import img9 from '../Images/Image9.jpg';
+import img10 from '../Images/Image10.jpg';
 
 const Home = () => {
     const [offerListings, setOfferListings] = useState([]);
     const [saleListings, setSaleListings] = useState([]);
     const [rentListings, setRentListings] = useState([]);
+    const ImageUrls = [[img1], [img2], [img3], [img4], [img5], [img6], [img7], [img8], [img9], [img10]];
     SwiperCore.use([Navigation]);
 
     useEffect(() => {
         const fetchOfferListings = async () => {
             try {
                 const res = await fetch("/api/listing/get?offer=true&limit=4");
-                const data = await res.json();
+                let data = await res.json();
+                data=data.map((item, index) => {
+                  item.imageUrls = ImageUrls[index];
+                  return item;
+                });
+                console.log(data);
                 setOfferListings(data);
                 fetchRentListings();
+                
             } catch (error) {
                 console.log(error);
             }
@@ -27,7 +44,11 @@ const Home = () => {
         const fetchRentListings = async () => {
             try {
                 const res = await fetch("/api/listing/get?type=rent&limit=4");
-                const data = await res.json();
+                let data = await res.json();
+                 data=data.map((item, index) => {
+                  item.imageUrls = ImageUrls[index];
+                  return item;
+                });
                 setRentListings(data);
                 fetchSaleListings();
             } catch (error) {
@@ -38,7 +59,11 @@ const Home = () => {
         const fetchSaleListings = async () => {
             try {
                 const res = await fetch("/api/listing/get?type=sale&limit=4");
-                const data = await res.json();
+                let data = await res.json();
+                 data=data.map((item, index) => {
+                  item.imageUrls = ImageUrls[index];
+                  return item;
+                });
                 setSaleListings(data);
             } catch (error) {
                 log(error);
@@ -83,7 +108,7 @@ const Home = () => {
                                     backgroundSize: "cover",
                                 }}
                                 className="h-[300px] lg:h-[500px]  sm:h-[350px]"
-                                key={listing._id}
+                                key={listing.id}
                             ></div>
                         </SwiperSlide>
                     ))}
@@ -107,7 +132,7 @@ const Home = () => {
                         </div>
                         <div className="flex flex-wrap gap-4">
                             {offerListings.map((listing) => (
-                                <ListingItem listing={listing} key={listing._id} />
+                                <ListingItem listing={listing} key={listing.id} />
                             ))}
                         </div>
                     </div>
@@ -128,7 +153,7 @@ const Home = () => {
                         </div>
                         <div className="flex flex-wrap gap-4">
                             {rentListings.map((listing) => (
-                                <ListingItem listing={listing} key={listing._id} />
+                                <ListingItem listing={listing} key={listing.id} />
                             ))}
                         </div>
                     </div>
@@ -149,7 +174,7 @@ const Home = () => {
                         </div>
                         <div className="flex flex-wrap gap-4">
                             {saleListings.map((listing) => (
-                                <ListingItem listing={listing} key={listing._id} />
+                                <ListingItem listing={listing} key={listing.id} />
                             ))}
                         </div>
                     </div>

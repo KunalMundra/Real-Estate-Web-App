@@ -30,8 +30,12 @@ export default function Listing() {
         const fetchListing = async () => {
             try {
                 setLoading(true);
+                
                 const res = await fetch(`/api/listing/get/${params.listingId}`);
-                const data = await res.json();
+                let data = await res.json();
+                console.log("listing data", data);
+                console.log("listing id", params.listingId)
+                data.imageUrls.push("/src/Images/" + params.img);
                 if (data.success === false) {
                     setError(true);
                     setLoading(false);
