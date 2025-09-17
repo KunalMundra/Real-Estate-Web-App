@@ -26,8 +26,8 @@ const __dirname = path.resolve();
 const app = express();
 
 
-app.listen(6000, () => {
-    console.log("Server is running on port 6000");
+app.listen(3010, () => {
+    console.log("Server is running on port 3010");
 })
 app.use(cors());
 
